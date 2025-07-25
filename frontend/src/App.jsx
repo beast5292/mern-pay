@@ -20,23 +20,47 @@ function App() {
     console.log("Error:" + error);
   };
 
-  const handlePayment = () => {
-    // Fetching the hashed and other data related to the payment, from the backend
-    fetch('/api/payment')
-      .then(response => response.json())
-      .then(result => {
-        // Filling the PayHere payment object with the data recieved from the backend
-        const paymentObject = {
-          "sandbox": true,                 // true if using Sandbox Merchant ID
-          "merchant_id": result.merchant_id,        // Replace your Merchant ID
-          "return_url": "http://localhost:3000/success",
-          "cancel_url": "http://localhost:3000/cancel",
+  const handlePayment = async () => {
+    const paymentObject = {
+      "order_id": "order123",
+      "items": "Shoes",
+      "amount": "50.00",
+      "currency": "LKR",
+      "first_name": "Saman",
+      "last_name": "Perera",
+      "email": "samanp@gmail.com",
+      "phone": "0771234567",
+      "address": "No.1, Galle Road",
+      "city": "Colombo",
+      "country": "Sri Lanka"
+    };
+
+    try {
+      // Request backend to generate the hash value
+      const response = await fetch(
+        "http://localhost:5000/api/payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(paymentObject),
+        }
+      );
+
+      if (response.ok) {
+        const { hash, merchant_id } = await response.json();
+
+        // Payment configuration
+        const payment = {
+          "merchant_id": merchant_id,        // Replace your Merchant ID
+          "return_url": undefined,
+          "cancel_url": undefined,
           "notify_url": "http://localhost:5000/api/payment/notify",
-          "order_id": result.order_id,
-          "items": "Testing Item",
+          "order_id": "order123",
+          "items": "Shoes",
           "amount": "50.00",
           "currency": "LKR",
-          "hash": result.hash,
           "first_name": "Saman",
           "last_name": "Perera",
           "email": "samanp@gmail.com",
@@ -44,17 +68,17 @@ function App() {
           "address": "No.1, Galle Road",
           "city": "Colombo",
           "country": "Sri Lanka",
-          "delivery_address": "No. 46, Galle road, Kalutara South",
-          "delivery_city": "Kalutara",
-          "delivery_country": "Sri Lanka",
-          "custom_1": "",
-          "custom_2": ""
+          hash: hash
         };
 
-        // Launching the PayHere GUI
-        payhere.startPayment(paymentObject);
-
-      });
+        // Initialize PayHere payment
+        payhere.startPayment(payment);
+      } else {
+        console.log("Failed to generate has for payment");
+      }
+    } catch (e) {
+      console.log("Error occured: ", e);
+    }
   };
 
   return (
