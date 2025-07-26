@@ -9,8 +9,10 @@ app.use(express.json());
 
 // Sandbox merchant credentials
 const merchant_id = "1231334";
-const merchant_secret = "MjI0ODc0OTQ3NTE1OTMzNDcxNjgzMjI5OTk0OTgzNTUwNTg3NDQ0";
-const decoded_secret = Buffer.from(merchant_secret, "base64").toString("utf8");
+const merchant_secret = "MzQyMDc4NTYxMjE1NTM5NTUwOTU0OTU4MDgyMTkzMTU0NTU0MDk2";
+
+// Decode the base64 merchant secret
+const decodedSecret = Buffer.from(merchant_secret, "base64").toString("utf-8");
 
 console.log("Backend loaded. Routes are being registered...");
 
@@ -32,10 +34,7 @@ app.post("/api/payment", (req, res) => {
             order_id +
             amount +
             currency +
-            crypto
-                .createHash("md5")
-                .update(decoded_secret)
-                .digest("hex") 
+            crypto.createHash("md5").update(decodedSecret).digest("hex")
         )
         .digest("hex")
         .toUpperCase();
@@ -64,10 +63,7 @@ app.post("/api/payment/notify", (req, res) => {
             payhere_amount +
             payhere_currency +
             status_code +
-            crypto
-                .createHash("md5")
-                .update(decoded_secret)
-                .digest("hex")
+            crypto.createHash("md5").update(decodedSecret).digest("hex")
         )
         .digest("hex")
         .toUpperCase();
