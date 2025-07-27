@@ -30,6 +30,9 @@ export default function Payment() {
       country: "Sri Lanka"
     };
 
+    // 👉 Toggle this to true or false to test with and without notify_url
+    const includeNotifyURL = true;
+
     try {
       const response = await fetch("http://localhost:5000/api/payment", {
         method: "POST",
@@ -43,14 +46,18 @@ export default function Payment() {
         const { hash, merchant_id } = await response.json();
 
         const payment = {
+          sandbox: true,
           merchant_id,
           return_url: "http://localhost:5173/payment-success",
           cancel_url: "http://localhost:5173/payment-cancelled",
-          notify_url: "http://localhost:5000/api/payment/notify",
+          ...(includeNotifyURL && {
+            notify_url: "https://localhost:5000/api/payment/notify", // ❌ will cause issues unless domain whitelisted
+          }),
           ...paymentObject,
           hash,
         };
 
+        console.log("Sending payment object:", payment);
         window.payhere.startPayment(payment);
       } else {
         console.log("Failed to generate hash for payment");

@@ -8,8 +8,8 @@ app.use(cors());
 app.use(express.json());
 
 // Sandbox merchant credentials
-const merchant_id = "1231334";
-const merchant_secret = "MzQyMDc4NTYxMjE1NTM5NTUwOTU0OTU4MDgyMTkzMTU0NTU0MDk2";
+const merchant_id = "1231378";
+const merchant_secret = "MzQ4NjkwMzA5MjIzMTYyMzk1NDkyMzQ2MzUwOTcwMzE4MDgwOTI0Ng==";
 
 // Decode the base64 merchant secret
 const decodedSecret = Buffer.from(merchant_secret, "base64").toString("utf-8");
@@ -39,7 +39,14 @@ app.post("/api/payment", (req, res) => {
         .digest("hex")
         .toUpperCase();
 
-    console.log("Hash generated for order:", order_id);
+    console.log("DEBUG >> Creating hash with:");
+    console.log("merchant_id:", merchant_id);
+    console.log("order_id:", order_id);
+    console.log("amount:", amount);
+    console.log("currency:", currency);
+    console.log("decodedSecret:", decodedSecret);
+    console.log("inner_md5:", crypto.createHash("md5").update(decodedSecret).digest("hex"));
+
 
     res.json({ hash, merchant_id });
 });
