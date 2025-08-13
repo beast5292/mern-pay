@@ -8,8 +8,8 @@ app.use(cors());
 app.use(express.json());
 
 // Sandbox merchant credentials
-const merchant_id = "1231378";
-const merchant_secret = "MzQ4NjkwMzA5MjIzMTYyMzk1NDkyMzQ2MzUwOTcwMzE4MDgwOTI0Ng==";
+const merchant_id = process.env.MERCHANT_ID;
+const merchant_secret = process.env.MERCHANT_SECRET;
 
 // Decode the base64 merchant secret
 const decodedSecret = Buffer.from(merchant_secret, "base64").toString("utf-8");
